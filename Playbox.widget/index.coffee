@@ -1,6 +1,7 @@
 # Code originally created by the awesome members of Ubersicht community.
 # I stole from so many I can't remember who you are, thank you so much everyone!
 # Haphazardly adjusted and mangled by Pe8er (https://github.com/Pe8er)
+# Code updated by Aaron2605 on 31/05/23 to work on the latest version of macos
 
 options =
   # Choose where the widget should sit on your screen.
@@ -11,7 +12,7 @@ options =
   widgetSize: "medium"                  # big | medium | smol
 
   # Choose color theme.
-  widgetTheme: "dark"                   # auto | dark | light
+  widgetTheme: "dark"                   # dark | light
 
   # Stick the widget in the corner? It removes round corners and shadows for a flat, minimalist setup.
   stickInCorner: false                  # true | false
@@ -37,9 +38,9 @@ style: """
   // Global scaling for large and medium variants.
 
   if #{options.widgetSize} == big
-    scale = 1
+    Scale = 1
   else
-    scale = 0.75
+    Scale = 0.75
 
   // Aesthetics: Color palette and blur properties.
 
@@ -56,7 +57,7 @@ style: """
 
   if #{options.stickInCorner} == false
     margin = 16pt
-    borderRadius = 8pt * scale
+    borderRadius = 8pt * Scale
     box-shadow 0 24pt 32pt 0 rgba(0,0,0,.4)
     border-radius borderRadius
     .text
@@ -99,7 +100,7 @@ style: """
   width @mainDimension
   overflow hidden
   white-space nowrap
-  background-color black
+  background-color bgColor05
   font-family system, -apple-system, "Helvetica Neue"
   font-size 8pt
   line-height 11pt
@@ -156,9 +157,9 @@ style: """
   .heart
     position absolute
     color white
-    top 4pt * scale
+    top 4pt * Scale
     #{options.horizontalPosition} @top
-    font-size 16pt * scale
+    font-size 16pt * Scale
 
 
   // Different styles for different widget sizes.
@@ -178,7 +179,7 @@ style: """
       align-items center
 
     .art
-      width mainDimension * scale
+      width mainDimension * Scale
       height @width
       margin 0
 
@@ -186,14 +187,14 @@ style: """
       position absolute
       float none
       text-align center
-      width mainDimension * scale
+      width mainDimension * Scale
       max-width @width
       bottom 0
       left 0
       margin 0
       color fColor1
       background-color none
-      padding 6pt * scale
+      padding 6pt * Scale
       -webkit-backdrop-filter blurProperties
 
 """
@@ -253,36 +254,38 @@ update: (output, domEl) ->
     tArtwork = values[5]
     songChanged = values[6]
     isLoved = values[7]
-    darkMode = values[8]
     currArt = "/" + div.find('.art').css('background-image').split('/').slice(-3).join().replace(/\,/g, '/').slice(0,-1)
     tWidth = div.width()
     tCurrent = (tPosition / tDuration) * tWidth
     div.find('.progress').css width: tCurrent
-    # console.log(tArtwork + ", " + currArt)
+    # console.log(tArtwork)
 
     div.show(1).animate({opacity: 1}, 250, 'swing')
 
     if currArt isnt tArtwork and tArtwork isnt 'NA'
       artwork = div.find('.art')
-      artwork.css('background-image', 'url('+tArtwork+')')
-
+      # Remove the comma using regular expression
+      lineWithoutComma = tArtwork.replace(/^\s*,|,\s*$/g, '')
+      console.log(lineWithoutComma)
+      artwork.css('background-image', 'url('+lineWithoutComma+')')
       # Trying to fade the artwork on load, failing so far.
-      # if songChanged is 'true'
-        # artwork.fadeIn(100)
-        # artwork.
-        # artwork.fadeIn(500)
+      if songChanged is 'true'
+        artwork.fadeIn(100)
+        artwork.
+        artwork.fadeIn(500)
 
-      # artwork = div.find('.art')
-      # img = new Image
-      # img.onload = ->
-      #   artwork.css
-      #     'background-image': 'url(' + tArtwork + ')'
-      #     'background-size': 'contain'
-      #   artwork.fadeIn 300
-      #   return
+      artwork = div.find('.art')
+      img = new Image
+      img.onload = ->
+        artwork.css
+          'background-image': 'url(' + tArtwork + ')'
+          'background-size': 'contain'
+        artwork.fadeIn 300
+        return
 
-      # img.src = tArtwork
-      # return
+      img.src = tArtwork
+      return
+      
     else if tArtwork is 'NA'
       artwork = div.find('.art')
       artwork.css('background-image', 'url(/Playbox.widget/lib/default.png)')
@@ -294,13 +297,5 @@ update: (output, domEl) ->
       div.find('.heart').show()
     else
       div.find('.heart').hide()
-
-    if @options.widgetTheme is 'auto'
-      if darkMode is 'true'
-        @options.widgetTheme = 'dark'
-      else
-        @options.widgetTheme = 'light'
-
-
 
   div.css('max-width', screen.width)
